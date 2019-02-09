@@ -7,7 +7,6 @@ tempdub
 class(tempdub)
 tempdub=(tempdub-32)*5/9
 plot(tempdub, ylab="Temperatura")
-git add Rplot.png
 descomp=decompose(tempdub)
 plot(descomp)
 
@@ -42,6 +41,64 @@ library(readxl)
 datos=read_excel("D:/Usuario/Documents/ModelacionDinamica/dengemalaria.xls")
 
 denge=ts(data = datos$denge,start = 2004,end = 2019, frequency = 12)
-plot(denge, ylab="Search Terms on Google")
-decompose_dengmal=decompose(denge)
-plot(decompose_dengmal)
+plot(denge, ylab="Search Terms on Google: Denge")
+decompose_denge=decompose(denge)
+plot(decompose_denge)
+
+malar=ts(data = datos$malaria,start = 2004,end = 2019, frequency = 12)
+plot(malar, ylab = "Search Terms on Google: Malar")
+decompose_malar=decompose(malar)
+plot(decompose_malar$trend+decompose_malar$seasonal+decompose_malar$random,type="l")
+lines(malar, type="l",col="red")
+plot(decompose_malar)
+
+#Graficas de Serie de Tiempo DINAMICOS
+require(plotly)
+datos$ID=1:182
+datos$malaria_trend=c(NA,as.numeric(decompose_denge$trend))
+datos$denge_trend=c(NA,as.numeric(decompose_malar$trend))
+
+
+plot_ly(datos,x=~ID,y=~denge_trend,mode="lines")
+
+plot_ly(datos, x=~ID, color=I("black"),mode="lines") %>% 
+  add_lines(y=~denge_trend) %>%
+  add_lines(y=~malaria_trend, color=I("red"))
+
+#Alisado Exponencial Simple
+data(tempdub)
+tempdub<-(tempdub-32)*5/9
+plot(tempdub, ylab="TemperaturaC", xlab="")
+plot(tempdub, ylab="Temperatura")
+descomp=decompose(tempdub)
+plot(descomp)
+
+alisim1= HoltWinters(tempdub, gamma=FALSE, beta=FALSE)
+alisim1
+
+pred.aliholt <- predict(alisim1, n.ahead=2, prediction.interval=TRUE)
+plot(alisim1, pred.aliholt, ylab="Temperatura °C", xlab="", main="Predicciones de la Temperatura")
+labs <- c("Valores observados", "Valores pronosticados", "IC de las predicciones")
+legend("bottomleft", lty=rep(1,3), col=c("black", "red", "blue"), legend=labs, cex=0.8)
+
+
+alisim2= HoltWinters(tempdub, gamma=TRUE, beta=FALSE)
+alisim2
+
+pred.aliholt <- predict(alisim2, n.ahead=2, prediction.interval=TRUE)
+plot(alisim2, pred.aliholt, ylab="Temperatura °C", xlab="", main="Predicciones de la Temperatura")
+labs <- c("Valores observados", "Valores pronosticados", "IC de las predicciones")
+legend("bottomleft", lty=rep(1,3), col=c("black", "red", "blue"), legend=labs, cex=0.8)
+
+alisim3= HoltWinters(tempdub, gamma=TRUE, beta=TRUE)
+alisim3
+
+pred.aliholt <- predict(alisim3, n.ahead=2, prediction.interval=TRUE)
+plot(alisim2, pred.aliholt, ylab="Temperatura °C", xlab="", main="Predicciones de la Temperatura")
+labs <- c("Valores observados", "Valores pronosticados", "IC de las predicciones")
+legend("bottomleft", lty=rep(1,3), col=c("black", "red", "blue"), legend=labs, cex=0.8)
+
+#oMITIENDO UNOS VALORES: HACIENDO UNA VALIDACION CRUZADA
+
+
+
