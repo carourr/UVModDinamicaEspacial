@@ -7,6 +7,7 @@ tempdub
 class(tempdub)
 tempdub=(tempdub-32)*5/9
 plot(tempdub, ylab="Temperatura")
+git add Rplot.png
 descomp=decompose(tempdub)
 plot(descomp)
 
